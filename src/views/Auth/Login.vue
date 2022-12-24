@@ -47,7 +47,6 @@
 </template>
 
 <script>
-
 import repository from '../../api-services/repository';
 import TargetComponent from '../../components/TargetComponent.vue';
 // import $ from 'jquery';
@@ -123,11 +122,9 @@ import TargetComponent from '../../components/TargetComponent.vue';
             },
             async login(){
                 this.error = null;
-
                 try{
                     await this.$store.dispatch('login' , this.user);
                     let data = JSON.parse(localStorage.getItem('user'));
-
                     if(data.data.user.roles === 'super-admin'){
                         await this.$router.push({name : 'home-page'});
                     }
@@ -170,7 +167,6 @@ import TargetComponent from '../../components/TargetComponent.vue';
                     }
                 */
             }
-
         }
     }
 </script>
