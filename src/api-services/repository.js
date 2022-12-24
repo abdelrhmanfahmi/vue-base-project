@@ -9,5 +9,11 @@ export default {
     },
     logout(){
         return api.get('http://127.0.0.1:8000/api/logout');
+    },
+    getClusterTarget(){
+        return api.get('http://127.0.0.1:8000/api/clusterTargets');
+    },
+    storeTargets(params){
+        return api.post('http://127.0.0.1:8000/api/storeTarget' , params);
     }
 }

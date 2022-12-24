@@ -60,7 +60,7 @@ export default createStore({
                 async logout({commit}){
                     await repository.logout();
                     await commit('SET_USER' , null);
-                    await commit('SET_PERMISSION' , null);
+                    // await commit('SET_PERMISSION' , null);
 
                     await localStorage.removeItem('user');
                 },

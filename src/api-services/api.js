@@ -5,7 +5,7 @@ import { createToaster } from "@meforma/vue-toaster";
 const toaster = createToaster();
 
 let instance = axios.create({
-    withCredentials: true
+    withCredentials: false
 });
 
 instance.interceptors.request.use(async request => {
