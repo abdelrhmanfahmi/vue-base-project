@@ -4,9 +4,17 @@ import Wrapper from '@/views/Wrapper';
 import Home from '@/views/Home';
 import HomeAdmin from '@/views/HomeAdmin';
 
+import TestPage from '@/views/testPage';
+
 import middleware from '@/middleware';
 
 const routes = [
+  {
+    path:'/test',
+    name:'test-page',
+    component: TestPage,
+    beforeEnter:middleware.guest
+  },
   {
     path: '/login',
     name: 'login-page',
