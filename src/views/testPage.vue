@@ -16,11 +16,14 @@
                 businessUnits:[],
                 marketShow:{},
                 curMarketIndex:-1,
+                curMarketIndexNow:1,
                 businessUnitShow:{},
                 curBusinessUnitIndex:-1,
                 market_id:null,
                 business_unit_id:null,
-                clusters:[]
+                clusters:[],
+                startNow:null,
+                flag:false
             }
         },
         mounted(){
@@ -43,14 +46,17 @@
                 let businessUnitsNumber = localStorage.getItem('businessUnitsNumbers');
                 console.log(businessUnitsNumber);
 
-                setInterval(this.showMarkets, businessUnitsNumber*5000);
-        
-                setTimeout(this.startBusinessUnit, (businessUnitsNumber*5000) - 5000);
+                this.startNow = setInterval(this.showMarkets, this.curMarketIndexNow*5000);
+                setTimeout(this.startBusinessUnit, (this.curBusinessUnitIndex*5000) - 5000);
                 
             },
             showMarkets(){
                 ++this.curMarketIndex;
+                let businessUnitsNumber = localStorage.getItem('businessUnitsNumbers');
+                this.curMarketIndexNow = businessUnitsNumber;
                 if (this.curMarketIndex >= this.markets.length) {
+                    console.log('ali');
+                    console.log(this.curMarketIndex);
                     this.curMarketIndex = 0;
                     // window.location.reload();
                 }
@@ -58,7 +64,8 @@
                 console.log(this.markets[this.curMarketIndex]);
                 this.marketShow = this.markets[this.curMarketIndex];
                 this.market_id = this.markets[this.curMarketIndex].id;
-
+                clearInterval(this.startNow);
+                setInterval(this.showMarkets, this.curMarketIndexNow*5000);
             },
             async showBusinessUnits(){
                 ++this.curBusinessUnitIndex;
