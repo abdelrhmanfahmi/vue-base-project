@@ -4,10 +4,31 @@
         <br>
         <h3>{{ businessUnitShow.name }}</h3>
     </div>
+    <div>
+        <div class="tab">
+            <button v-for="market in markets" :key="market.id" :class="'tablinks data'+market.name" @click="openCity($event, market.name)">{{market.name}}</button>
+        </div>
+
+        <div id="GCC" class="tabcontent">
+            <h3>London</h3>
+            <p>London is the capital city of England.</p>
+        </div>
+
+        <div id="KSA" class="tabcontent">
+            <h3>Paris</h3>
+            <p>Paris is the capital of France.</p> 
+        </div>
+
+        <div id="Egypt" class="tabcontent">
+            <h3>Tokyo</h3>
+            <p>Tokyo is the capital of Japan.</p>
+        </div>
+    </div>
 </template>
 
 <script>
     import repository from '../api-services/repository';
+    import $ from 'jquery';
     export default{
         name:'test-page',
         data(){
@@ -23,71 +44,100 @@
                 business_unit_id:null,
                 clusters:[],
                 startNow:null,
-                flag:false
+                flag:false,
+                isActive:false,
             }
         },
         mounted(){
             this.getMarkets();
-            this.getBusinessUnits();
-            this.showPreview();
         },
         methods:{
+            openCity(evt, cityName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(cityName).style.display = "block";
+                evt.currentTarget.className += " active";
+            },
+            sleep(milliseconds){
+                return new Promise(resolve => setTimeout(resolve, milliseconds));  
+            },
             async getMarkets(){
                 const response = await repository.getMarkets();
                 this.markets = response.data;
-                localStorage.setItem('MarketsNumbers' , response.data.length);
+                for(let market of this.markets){
+                    this.marketShow = market;
+                    if(market.name === 'GCC'){
+                        $('.dataGCC').addClass('active');
+                        $('.dataKSA').removeClass('active');
+                        $('.dataEgypt').removeClass('active');
+                    }else if(market.name === 'KSA'){
+                        $('.dataGCC').removeClass('active');
+                        $('.dataKSA').addClass('active');
+                        $('.dataEgypt').removeClass('active');
+                    }else{
+                        $('.dataGCC').removeClass('active');
+                        $('.dataKSA').removeClass('active');
+                        $('.dataEgypt').addClass('active');
+                    }
+                    await this.getBusinessUnits();
+                }
+                this.getMarkets();
             },
             async getBusinessUnits(){
                 const response = await repository.getBusinessUnits();
                 this.businessUnits = response.data;
-                localStorage.setItem('businessUnitsNumbers' , response.data.length);
-            },
-            showPreview(){
-                let businessUnitsNumber = localStorage.getItem('businessUnitsNumbers');
-                console.log(businessUnitsNumber);
-
-                this.startNow = setInterval(this.showMarkets, this.curMarketIndexNow*5000);
-                setTimeout(this.startBusinessUnit, (this.curBusinessUnitIndex*5000) - 5000);
                 
-            },
-            showMarkets(){
-                ++this.curMarketIndex;
-                let businessUnitsNumber = localStorage.getItem('businessUnitsNumbers');
-                this.curMarketIndexNow = businessUnitsNumber;
-                if (this.curMarketIndex >= this.markets.length) {
-                    console.log('ali');
-                    console.log(this.curMarketIndex);
-                    this.curMarketIndex = 0;
-                    // window.location.reload();
+                for(let businessUnit of this.businessUnits){
+                    this.businessUnitShow = businessUnit;
+                    await this.sleep(2000);
                 }
-
-                console.log(this.markets[this.curMarketIndex]);
-                this.marketShow = this.markets[this.curMarketIndex];
-                this.market_id = this.markets[this.curMarketIndex].id;
-                clearInterval(this.startNow);
-                setInterval(this.showMarkets, this.curMarketIndexNow*5000);
             },
-            async showBusinessUnits(){
-                ++this.curBusinessUnitIndex;
-                if (this.curBusinessUnitIndex >= this.businessUnits.length) {
-                    this.curBusinessUnitIndex = 0;
-                }
-                console.log(this.businessUnits[this.curBusinessUnitIndex]);
-                this.businessUnitShow = this.businessUnits[this.curBusinessUnitIndex];
-                this.business_unit_id = this.businessUnits[this.curBusinessUnitIndex].id;
-                console.log({'business_unit ':this.business_unit_id});
-                console.log({'market_id ':this.market_id});
-                const res = await repository.getClusters(this.market_id , this.business_unit_id);
-                console.log(res);
-            },
-            startBusinessUnit(){
-                setInterval(this.showBusinessUnits, 5000);
-            }
             
         }
     }
 </script>
 
 <style scoped>
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
 
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
 </style>
