@@ -6,23 +6,14 @@
     </div>
     <div>
         <div class="tab">
-            <button v-for="market in markets" :key="market.id" :class="'tablinks data'+market.name" @click="openCity($event, market.name)">{{market.name}}</button>
+            <button style="pointer-events:none;" v-for="market in markets" :key="market.id" :class="'tablinks data'+market.name" @click="openCity($event, market.name)">{{market.name}}</button>
         </div>
 
-        <div id="GCC" class="tabcontent">
+        <div id="GCC" class="tabcontent" style="display: block;">
             <h3>London</h3>
             <p>London is the capital city of England.</p>
         </div>
 
-        <div id="KSA" class="tabcontent">
-            <h3>Paris</h3>
-            <p>Paris is the capital of France.</p> 
-        </div>
-
-        <div id="Egypt" class="tabcontent">
-            <h3>Tokyo</h3>
-            <p>Tokyo is the capital of Japan.</p>
-        </div>
     </div>
 </template>
 
@@ -52,6 +43,24 @@
             this.getMarkets();
         },
         methods:{
+            changeStatus(market){
+                if(market === 'GCC'){
+                    this.isActive = true;
+                    $('.dataGCC').addClass('active');
+                    $('.dataKSA').removeClass('active');
+                    $('.dataEgypt').removeClass('active');
+                }else if(market === 'KSA'){
+                    this.isActive = false;
+                    $('.dataGCC').removeClass('active');
+                    $('.dataKSA').addClass('active');
+                    $('.dataEgypt').removeClass('active');
+                }else{
+                    this.isActive = false;
+                    $('.dataGCC').removeClass('active');
+                    $('.dataKSA').removeClass('active');
+                    $('.dataEgypt').addClass('active');
+                }
+            },
             openCity(evt, cityName) {
                 var i, tabcontent, tablinks;
                 tabcontent = document.getElementsByClassName("tabcontent");
@@ -73,19 +82,7 @@
                 this.markets = response.data;
                 for(let market of this.markets){
                     this.marketShow = market;
-                    if(market.name === 'GCC'){
-                        $('.dataGCC').addClass('active');
-                        $('.dataKSA').removeClass('active');
-                        $('.dataEgypt').removeClass('active');
-                    }else if(market.name === 'KSA'){
-                        $('.dataGCC').removeClass('active');
-                        $('.dataKSA').addClass('active');
-                        $('.dataEgypt').removeClass('active');
-                    }else{
-                        $('.dataGCC').removeClass('active');
-                        $('.dataKSA').removeClass('active');
-                        $('.dataEgypt').addClass('active');
-                    }
+                    this.changeStatus(market.name);
                     await this.getBusinessUnits();
                 }
                 this.getMarkets();
@@ -93,7 +90,9 @@
             async getBusinessUnits(){
                 const response = await repository.getBusinessUnits();
                 this.businessUnits = response.data;
-                
+                if(this.isActive === true){
+                    $('.dataGCC').addClass('active');
+                }
                 for(let businessUnit of this.businessUnits){
                     this.businessUnitShow = businessUnit;
                     await this.sleep(2000);
